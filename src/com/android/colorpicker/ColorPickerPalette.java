@@ -79,14 +79,14 @@ public class ColorPickerPalette extends TableLayout {
     }
 
     /**
-     * Adds swatches to table in a serpentine format.
+     * Adds swatches to table.
      */
     public void drawPalette(int[] colors, int selectedColor) {
         drawPalette(colors, selectedColor, null);
     }
 
     /**
-     * Adds swatches to table in a serpentine format.
+     * Adds swatches to table.
      */
     public void drawPalette(int[] colors, int selectedColor, String[] colorContentDescriptions) {
         if (colors == null) {
@@ -96,15 +96,13 @@ public class ColorPickerPalette extends TableLayout {
         this.removeAllViews();
         int tableElements = 0;
         int rowElements = 0;
-        int rowNumber = 0;
 
         // Fills the table with swatches based on the array of colors.
         TableRow row = createTableRow();
         for (int color : colors) {
             View colorSwatch = createColorSwatch(color, selectedColor);
-            setSwatchDescription(rowNumber, tableElements, rowElements, color == selectedColor,
-                    colorSwatch, colorContentDescriptions);
-            addSwatchToRow(row, colorSwatch, rowNumber);
+            setSwatchDescription(tableElements, color == selectedColor, colorSwatch, colorContentDescriptions);
+            row.addView(colorSwatch);
 
             tableElements++;
             rowElements++;
@@ -112,14 +110,13 @@ public class ColorPickerPalette extends TableLayout {
                 addView(row);
                 row = createTableRow();
                 rowElements = 0;
-                rowNumber++;
             }
         }
 
         // Create blank views to fill the row if the last row has not been filled.
         if (rowElements > 0) {
             while (rowElements != mNumColumns) {
-                addSwatchToRow(row, createBlankSpace(), rowNumber);
+                row.addView(createBlankSpace());
                 rowElements++;
             }
             addView(row);
@@ -127,38 +124,15 @@ public class ColorPickerPalette extends TableLayout {
     }
 
     /**
-     * Appends a swatch to the end of the row for even-numbered rows (starting with row 0),
-     * to the beginning of a row for odd-numbered rows.
+     * Add a content description to the specified swatch view.
      */
-    private static void addSwatchToRow(TableRow row, View swatch, int rowNumber) {
-        if (rowNumber % 2 == 0) {
-            row.addView(swatch);
-        } else {
-            row.addView(swatch, 0);
-        }
-    }
-
-    /**
-     * Add a content description to the specified swatch view. Because the colors get added in a
-     * snaking form, every other row will need to compensate for the fact that the colors are added
-     * in an opposite direction from their left->right/top->bottom order, which is how the system
-     * will arrange them for accessibility purposes.
-     */
-    private void setSwatchDescription(int rowNumber, int index, int rowElements, boolean selected,
-            View swatch, String[] contentDescriptions) {
+    private void setSwatchDescription(int index, boolean selected, View swatch, String[] contentDescriptions) {
         String description;
         if (contentDescriptions != null && contentDescriptions.length > index) {
             description = contentDescriptions[index];
         } else {
             int accessibilityIndex;
-            if (rowNumber % 2 == 0) {
-                // We're in a regular-ordered row
-                accessibilityIndex = index + 1;
-            } else {
-                // We're in a backwards-ordered row.
-                int rowMax = ((rowNumber + 1) * mNumColumns);
-                accessibilityIndex = rowMax - rowElements;
-            }
+            accessibilityIndex = index + 1;
 
             if (selected) {
                 description = String.format(mDescriptionSelected, accessibilityIndex);
