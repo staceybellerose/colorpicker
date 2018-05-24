@@ -165,4 +165,54 @@ public class ColorPickerPalette extends TableLayout {
         view.setLayoutParams(params);
         return view;
     }
+
+    public void selectColor(int color)
+    {
+        for(int i=0; i< this.getChildCount(); ++i)
+        {
+            View firstChild = (this).getChildAt(i);
+            if (!(firstChild instanceof TableRow))
+            {
+                continue;
+            }
+
+            for(int j=0; j <((TableRow)firstChild).getChildCount(); j++)
+            {
+                View secondChild = ((TableRow)firstChild).getChildAt(j);
+                ColorPickerSwatch swatch = (ColorPickerSwatch) secondChild;
+                swatch.setChecked(swatch.getColor() == color);
+            }
+        }
+    }
+
+    public Integer getSelectedColor()
+    {
+        Integer selected = null;
+
+        for(int i=0; i< this.getChildCount(); ++i)
+        {
+            View firstChild = (this).getChildAt(i);
+            if (!(firstChild instanceof TableRow))
+            {
+                continue;
+            }
+
+            for(int j=0; j <((TableRow)firstChild).getChildCount(); j++)
+            {
+                View secondChild = ((TableRow)firstChild).getChildAt(j);
+                ColorPickerSwatch swatch = (ColorPickerSwatch) secondChild;
+                if (swatch.getChecked() == true)
+                {
+                    selected = swatch.getColor();
+                    break;
+                }
+            }
+
+            if (selected != null)
+            {
+                break;
+            }
+        }
+        return selected;
+    }
 }

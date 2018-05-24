@@ -107,7 +107,7 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
         mSwatchImage.setImageDrawable(swatch);
     }
 
-    private void setChecked(boolean checked) {
+    public void setChecked(boolean checked) {
         if (checked) {
             mCheckmarkImage.setVisibility(View.VISIBLE);
         } else {
@@ -115,6 +115,14 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
         }
     }
 
+    public int getColor() {
+        return mColor;
+    }
+
+    public boolean getChecked() {
+        return mCheckmarkImage.getVisibility() == View.VISIBLE;
+    }
+    
     @Override
     public void onClick(View v) {
         if (mOnColorSelectedListener != null) {
