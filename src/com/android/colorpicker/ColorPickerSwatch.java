@@ -18,8 +18,10 @@ package com.android.colorpicker;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,8 +48,22 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
         void onColorSelected(int color);
     }
 
-    public ColorPickerSwatch(Context context, int color, boolean checked,
-            OnColorSelectedListener listener) {
+    public ColorPickerSwatch(Context context) {
+        super(context);
+        init(null, 0);
+    }
+
+    public ColorPickerSwatch(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(attrs, 0);
+    }
+
+    public ColorPickerSwatch(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init(attrs, defStyle);
+    }
+
+    public ColorPickerSwatch(Context context, int color, boolean checked, OnColorSelectedListener listener) {
         super(context);
         mColor = color;
         mOnColorSelectedListener = listener;
@@ -58,6 +74,20 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
         setColor(color);
         setChecked(checked);
         setOnClickListener(this);
+    }
+
+    private void init(AttributeSet attrs, int defStyle) {
+        TypedArray typedArray = getContext().getTheme().obtainStyledAttributes(
+                attrs, R.styleable.ColorPickerSwatch, defStyle, defStyle);
+
+        try {
+            int color = typedArray.getColor(R.styleable.ColorPickerSwatch_color, mColor);
+            boolean checked = typedArray.getBoolean(R.styleable.ColorPickerSwatch_checked, false);
+            setColor(color);
+            setChecked(checked);
+        } finally {
+            typedArray.recycle();
+        }
     }
 
     protected void setColor(int color) {
