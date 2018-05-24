@@ -33,6 +33,7 @@ import android.widget.ImageView;
  */
 public class ColorPickerSwatch extends FrameLayout implements View.OnClickListener {
     private int mColor;
+    private boolean mChecked;
     private ImageView mSwatchImage;
     private ImageView mCheckmarkImage;
     private OnColorSelectedListener mOnColorSelectedListener;
@@ -50,47 +51,51 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
 
     public ColorPickerSwatch(Context context) {
         super(context);
-        init(null, 0);
+        init();
     }
 
     public ColorPickerSwatch(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(attrs, 0);
+        processAttributes(attrs, 0);
+        init();
     }
 
     public ColorPickerSwatch(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(attrs, defStyle);
+        processAttributes(attrs, defStyle);
+        init();
     }
 
     public ColorPickerSwatch(Context context, int color, boolean checked, OnColorSelectedListener listener) {
         super(context);
         mColor = color;
+        mChecked = checked;
         mOnColorSelectedListener = listener;
-
-        LayoutInflater.from(context).inflate(R.layout.color_picker_swatch, this);
-        mSwatchImage = findViewById(R.id.color_picker_swatch);
-        mCheckmarkImage = findViewById(R.id.color_picker_checkmark);
-        setColor(color);
-        setChecked(checked);
-        setOnClickListener(this);
+        init();
     }
 
-    private void init(AttributeSet attrs, int defStyle) {
+    private void processAttributes(AttributeSet attrs, int defStyle) {
         TypedArray typedArray = getContext().getTheme().obtainStyledAttributes(
                 attrs, R.styleable.ColorPickerSwatch, defStyle, defStyle);
 
         try {
-            int color = typedArray.getColor(R.styleable.ColorPickerSwatch_color, mColor);
-            boolean checked = typedArray.getBoolean(R.styleable.ColorPickerSwatch_checked, false);
-            setColor(color);
-            setChecked(checked);
+            mColor = typedArray.getColor(R.styleable.ColorPickerSwatch_color, mColor);
+            mChecked = typedArray.getBoolean(R.styleable.ColorPickerSwatch_checked, false);
         } finally {
             typedArray.recycle();
         }
     }
 
-    protected void setColor(int color) {
+    private void init() {
+        LayoutInflater.from(getContext()).inflate(R.layout.color_picker_swatch, this);
+        mSwatchImage = findViewById(R.id.color_picker_swatch);
+        mCheckmarkImage = findViewById(R.id.color_picker_checkmark);
+        setColor(mColor);
+        setChecked(mChecked);
+        setOnClickListener(this);
+    }
+
+    public void setColor(int color) {
         Resources res = getContext().getResources();
 
         GradientDrawable swatch = (GradientDrawable) res.getDrawable(R.drawable.color_picker_swatch);
@@ -108,7 +113,8 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
     }
 
     public void setChecked(boolean checked) {
-        if (checked) {
+        mChecked = checked;
+        if (mChecked) {
             mCheckmarkImage.setVisibility(View.VISIBLE);
         } else {
             mCheckmarkImage.setVisibility(View.GONE);
